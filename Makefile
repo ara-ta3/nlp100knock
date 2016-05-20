@@ -1,15 +1,19 @@
+.PHONY: requirements.txt
+
 run: dev/bin/jupyter
 	$< notebook
 
-dev/bin/jupyter: install
+dev/bin/jupyter: requirements.txt bash_kernel
 
-install: bash_kernel
+bash_kernel: dev/bin/python requirements.txt
+	$< -m bash_kernel.install
 
-bash_kernel: dev/bin requirements.txt
-	PATH=$< python -m bash_kernel.install
+dev/bin/python: dev/bin
 
-requirements.txt: dev/bin
-	PATH=$< pip install -r $@
+requirements.txt: dev/bin/pip
+	$< install -r $@
+
+dev/bin/pip: dev/bin
 
 dev/bin:
-	test -d $@ || virtualenv -p python3 dev
+	virtualenv -p python3 dev
